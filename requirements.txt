@@ -1,0 +1,39 @@
+flask~= 2.0
+
+eventlet>=0.31.0
+validators
+timeago ~=1.0
+inscriptis ~= 1.2
+feedgen ~= 0.9
+flask-login ~= 0.5
+pytz
+
+# Set these versions together to avoid a RequestsDependencyWarning
+requests[socks] ~= 2.26
+urllib3 > 1.26
+chardet > 2.3.0
+
+wtforms ~= 2.3.3
+wtforms_components ~= 0.10.5
+jsonpath-ng ~= 1.5.3
+
+# Notification library
+apprise ~= 0.9.6
+
+# apprise mqtt https://github.com/chuckmac/adrfinder/issues/315
+paho-mqtt
+
+# Pinned version of cryptography otherwise
+# ERROR: Could not build wheels for cryptography which use PEP 517 and cannot be installed directly
+cryptography ~= 3.4
+
+# Used for CSS filtering
+bs4
+
+# XPath filtering, lxml is required by bs4 anyway, but put it here to be safe.
+lxml
+
+# 3.141 was missing socksVersion, 3.150 was not in pypi, so we try 4.1.0
+selenium ~= 4.1.0
+pytest ~=6.2
+pytest-flask ~=1.2

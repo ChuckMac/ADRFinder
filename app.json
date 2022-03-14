@@ -1,0 +1,21 @@
+{
+  "name": "ADRFinder",
+  "description": "Self-hosted open source Disney dining reservation monitoring and notification service.",
+  "keywords": [
+    "adrfinder",
+    "disney dining reservations"
+  ],
+  "repository": "https://github.com/chuckmac/adrfinder",
+  "success_url": "/",
+  "scripts": {
+  },
+  "env": {
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "free"
+    }
+  },
+  "image": "heroku/python"
+}

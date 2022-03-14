@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<div class="box">
+    <div class="pure-form history" id="new-watch-form">
+        <h1 class="hist-header">History</h1>
+        <span class="search-parm hist-header">Restaurant: <strong>{{restaurant}}</strong></span>
+        <span class="search-parm hist-header">Date: <strong>{{date}}</strong></span>
+        <span class="search-parm hist-header">Time: <strong>{{search_time}}</strong></span>
+        <span class="search-parm hist-header">Total Searches: <strong>{{total_searches}}</strong> / Total Matches: <strong>{{total_matches}}</strong></span>
+    </div>
+        <table class="pure-table pure-table-bordered">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Match Found</th>
+                    <th>Reservation Time</th>
+                    <th>Link</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for history in history %}
+                <tr class="{{ loop.cycle('pure-table-odd', 'pure-table-even') }}">
+                    <td>{{ loop.index }}</td>
+                    <td>{{history.date}}</td>
+                    <td>{{history.time}}</td>
+                    <td><a href="{{history.url}}" target="_BLANK">Reservation Link</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+</div>
+
+{% endblock %}

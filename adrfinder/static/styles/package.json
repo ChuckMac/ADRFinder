@@ -1,0 +1,16 @@
+{
+  "name": "adrfinder-theme",
+  "version": "0.0.3",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "node-sass styles.scss -o ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-sass": "^7.0.0",
+    "tar": "^6.1.9",
+    "trim-newlines": "^3.0.1"
+  }
+}

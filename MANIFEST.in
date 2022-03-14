@@ -1,0 +1,6 @@
+recursive-include adrfinder/templates *
+recursive-include adrfinder/static *
+include adrfinder.py
+global-exclude *.pyc
+global-exclude *node_modules*
+global-exclude venv

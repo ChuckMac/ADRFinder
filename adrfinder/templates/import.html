@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="edit-form">
+     <div class="inner">
+        <form class="pure-form pure-form-aligned" action="{{url_for('import_page')}}" method="POST">
+            <fieldset class="pure-group">
+              <legend>
+                Enter one URL per line, and optionally add tags for each URL after a space, delineated by comma (,):
+                <br>
+                <code>https://example.com tag1, tag2, last tag</code>
+                <br>
+                URLs which do not pass validation will stay in the textarea.
+              </legend>
+              
+
+                <textarea name="urls" class="pure-input-1-2" placeholder="https://"
+                          style="width: 100%;
+                                font-family:monospace;
+                                white-space: pre;
+                                overflow-wrap: normal;
+                                overflow-x: scroll;" rows="25">{{ remaining }}</textarea>
+            </fieldset>
+            <button type="submit" class="pure-button pure-input-1-2 pure-button-primary">Import</button>
+        </form>
+     </div>
+</div>
+
+{% endblock %}

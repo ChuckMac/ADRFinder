@@ -1,0 +1,87 @@
+
+{% from '_helpers.jinja' import render_field %}
+
+{% macro render_common_settings_form(form, current_base_url) %}
+
+                        <div class="pure-control-group">
+                            {{ render_field(form.notification_urls, rows=5, placeholder="Examples:
+    Gitter - gitter://token/room
+    Office365 - o365://TenantID:AccountEmail/ClientID/ClientSecret/TargetEmail
+    AWS SNS - sns://AccessKeyID/AccessSecretKey/RegionName/+PhoneNo
+    SMTPS - mailtos://user:pass@mail.domain.com?to=receivingAddress@example.com")
+                            }}
+                            <div class="pure-form-message-inline">
+                              <ul>
+                                <li>Use <a target=_new href="https://github.com/caronc/apprise">AppRise URLs</a> for notification to just about any service! <i><a target=_new href="https://github.com/chuckmac/adrfinder/wiki/Notification-configuration-notes">Please read the notification services wiki here for important configuration notes</a></i>.</li>
+                                <li><code>discord://</code> will silently fail if the total message length is more than 2000 chars.</li>
+                                <li><code>tgram://</code> bots cant send messages to other bots, so you should specify chat ID of non-bot user.</li>
+                                <li>Go here for <a href="{{url_for('notification_logs')}}">Notification debug logs</a></li>
+                              </ul>
+                            </div>
+                        </div>
+                        <div id="notification-customisation">
+                            <div class="pure-control-group">
+                                {{ render_field(form.notification_title, class="m-d") }}
+                                <span class="pure-form-message-inline">Title for all notifications</span>
+                            </div>
+                            <div class="pure-control-group">
+                                {{ render_field(form.notification_body , rows=5) }}
+                                <span class="pure-form-message-inline">Body for all notifications</span>
+                            </div>
+                            <div class="pure-control-group">
+                                {{ render_field(form.notification_format , rows=5) }}
+                                <span class="pure-form-message-inline">Format for all notifications</span>
+                            </div>
+                            <div class="pure-controls">
+                            <span class="pure-form-message-inline">
+                                These tokens can be used in the notification body and title to
+                                customise the notification text.
+                            </span>
+                                <table class="pure-table" id="token-table">
+                                    <thead>
+                                    <tr>
+                                        <th>Token</th>
+                                        <th>Description</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td><code>{base_url}</code></td>
+                                        <td>The URL of the ADRFinder instance you are running.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>{restaurant}</code></td>
+                                        <td>The name of the restaurant being watched.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>{watch_uuid}</code></td>
+                                        <td>The UUID of the watch.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>{search_date}</code></td>
+                                        <td>The search date in the watch.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>{search_time}</code></td>
+                                        <td>The search time in the watch.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>{party_size}</code></td>
+                                        <td>The size of the party in the watch.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>{found_reservations}</code></td>
+                                        <td>Reservation time and link found.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>{watch_tag}</code></td>
+                                        <td>The tag of the watch.</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="pure-control-group">
+                            {{ render_field(form.trigger_check) }}
+                        </div>
+{% endmacro %}

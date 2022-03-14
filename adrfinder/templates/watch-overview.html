@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% block content %}
+{% from '_helpers.jinja' import render_simple_field %}
+{% from '_helpers.jinja' import render_select %}
+
+<script type="text/javascript" src="{{url_for('static_content', group='js', filename='choices.min.js')}}" defer></script>
+
+<div class="box">
+
+    <form class="pure-form" action="{{ url_for('api_watch_add') }}" method="POST" id="new-watch-form">
+        <fieldset>
+            <legend>Add a new dining alert</legend>
+                {{ render_select(form.restaurant, placeholder="Select Restaurant...") }}
+                {{ render_simple_field(form.date, required=true) }}
+                {{ render_select(form.party_size) }}
+                {{ render_select(form.search_time) }}
+                {{ render_simple_field(form.tag, value=active_tag if active_tag else '', placeholder="tag") }}
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const choices = new Choices('#restaurant');
+                    });
+                </script>
+            <button type="submit" class="pure-button pure-button-primary">Watch</button>
+        </fieldset>
+        <!-- add extra stuff, like do a http POST and send headers -->
+        <!-- user/pass r = requests.get('https://api.github.com/user', auth=('user', 'pass')) -->
+    </form>
+    <div>
+        <a href="{{url_for('index')}}" class="pure-button button-tag {{'active' if not active_tag }}">All</a>
+        {% for tag in tags %}
+            {% if tag != "" %}
+                <a href="{{url_for('index', tag=tag) }}" class="pure-button button-tag {{'active' if active_tag == tag }}">{{ tag }}</a>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <div id="watch-table-wrapper">
+        <table class="pure-table pure-table-striped watch-table">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th></th>
+                <th></th>
+                <th>Last Checked</th>
+                <th>Last Found</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+
+
+            {% for watch in watches %}
+            <tr id="{{ watch.uuid }}"
+                class="{{ loop.cycle('pure-table-odd', 'pure-table-even') }}
+                {% if watch.last_error is defined and watch.last_error != False %}error{% endif %}
+                {% if watch.last_notification_error is defined and watch.last_notification_error != False %}error{% endif %}
+                {% if watch.paused is defined and watch.paused != False %}paused{% endif %}
+                {% if watch.newest_history_key| int > watch.last_viewed| int %}unviewed{% endif %}">
+                <td class="inline">{{ loop.index }}</td>
+                <td class="inline paused-state state-{{watch.paused}}">
+                    {% if watch.expired is defined and watch.expired == True %}
+                        <img src="{{url_for('static_content', group='images', filename='expired.svg')}}" alt="Expired" title="Expired" width=19 height=19/>
+                    {% elif watch.paused is defined and watch.paused == False %}
+                        <a href="{{url_for('index', pause=watch.uuid, tag=active_tag)}}">
+                            <img src="{{url_for('static_content', group='images', filename='pause.svg')}}" alt="Pause" title="Pause" width=19 height=19/>
+                        </a>
+                    {% else %}
+                    <a href="{{url_for('index', pause=watch.uuid, tag=active_tag)}}">
+                        <img src="{{url_for('static_content', group='images', filename='restart.svg')}}" alt="Restart" title="Restart" width=19 height=19/>
+                    </a>
+                    {% endif %}
+
+                </td>
+
+                <td class="title-col inline">
+                    {{watch.restaurant_name}}
+
+                    {% if watch.last_error is defined and watch.last_error != False %}
+                    <div class="fetch-error">{{ watch.last_error }}</div>
+                    {% endif %}
+                    {% if watch.last_notification_error is defined and watch.last_notification_error != False %}
+                    <div class="fetch-error notification-error">{{ watch.last_notification_error }}</div>
+                    {% endif %}
+                    {% if watch.tag != "" and not active_tag %}
+                    <span class="watch-tag-list">[{{ watch.tag}}]</span>
+                    {% endif %}
+                    <span class="watch-date expired-{{watch.expired}}">{{ watch.date_formatted }}</span>
+                    <span class="watch-time">{{ watch.search_time_formatted }}</span>
+                    <span class="watch-party-size">Party Size: {{ watch.party_size }}</span>
+
+                </td>
+                <td class="last-checked">
+                    {{watch|format_last_checked_time}}
+                    {% if watch.expired == True %}
+                        <div class="paused-for">[Expired]</div>
+                    {% elif watch.paused_for is defined and watch.paused == True %}
+                        <div class="paused-for">[Paused for {{ watch.paused_for }}]</div>
+                    {% elif watch.paused == True %}
+                        <div class="paused-for">[Paused]</div>
+                    {% endif %}
+
+                </td>
+                <td class="last-changed">{% if watch.history|length >= 1 and watch.last_changed %}
+                    {{watch.last_changed|format_timestamp_timeago}}
+                    {% else %}
+                    Not yet
+                    {% endif %}
+                </td>
+                <td>
+                    {% if watch.expired != True %}
+                    <a href="{{ url_for('api_watch_checknow', uuid=watch.uuid, tag=request.args.get('tag')) }}"
+                       class="pure-button button-small pure-button-primary">Recheck</a>
+                    {% endif %}
+                    <a href="{{ url_for('edit_page', uuid=watch.uuid)}}" class="pure-button button-small pure-button-primary">Edit</a>
+                    {% if watch.history %}
+                    <a href="{{ url_for('history_page', uuid=watch.uuid) }}" target="{{watch.uuid}}" class="pure-button button-small pure-button-primary">History</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <ul id="post-list-buttons">
+            {% if has_unviewed %}
+            <li>
+                <a href="{{url_for('mark_all_viewed', tag=request.args.get('tag')) }}" class="pure-button button-tag ">Mark all viewed</a>
+            </li>
+            {% endif %}
+            <li>
+               <a href="{{ url_for('api_watch_checknow', tag=active_tag) }}" class="pure-button button-tag ">Recheck
+                all {% if active_tag%}in "{{active_tag}}"{%endif%}</a>
+            </li>
+            <li>
+                <a href="{{ url_for('rss', tag=active_tag , token=app_rss_token)}}"><img alt="RSS Feed" id="feed-icon" src="{{url_for('static_content', group='images', filename='Generic_Feed-icon.svg')}}" height="15"></a>
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

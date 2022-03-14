@@ -1,0 +1,10 @@
+__pycache__
+.idea
+*.pyc
+datastore/url-watches.json
+datastore/*
+__pycache__
+.pytest_cache
+build
+dist
+.vscode/settings.json

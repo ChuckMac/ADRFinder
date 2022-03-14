@@ -1,0 +1,15 @@
+version: '2'
+services:
+    adrfinder:
+      build: 
+        context: .
+        dockerfile: Dockerfile
+      container_name: adrfinder
+      hostname: adrfinder
+      volumes:
+        - ./datastore:/datastore:/datastore
+        - .:/app
+      ports:
+        - 5500:5500
+      restart: unless-stopped
+

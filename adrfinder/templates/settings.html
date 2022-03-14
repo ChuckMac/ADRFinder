@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% from '_helpers.jinja' import render_field, render_select_label %}
+{% from '_common_fields.jinja' import render_common_settings_form %}
+
+<script type="text/javascript" src="{{url_for('static_content', group='js', filename='settings.js')}}" defer></script>
+<script type="text/javascript" src="{{url_for('static_content', group='js', filename='tabs.js')}}" defer></script>
+
+<div class="edit-form">
+    <div class="tabs">
+        <ul>
+            <li class="tab" id="default-tab"><a href="#general">General</a></li>
+            <li class="tab"><a href="#notifications">Notifications</a></li>
+        </ul>
+    </div>
+    <div class="box-wrap inner">
+        <form class="pure-form pure-form-stacked settings" action="{{url_for('settings_page')}}" method="POST">
+            <div class="tab-pane-inner" id="general">
+                <fieldset>
+                    <div class="pure-control-group">
+                        {{ render_field(form.minutes_between_check) }}
+                        <span class="pure-form-message-inline">Default time for all watches, when the watch does not have a specific time setting.</span>
+                    </div>
+                    <div class="pure-control-group">
+                        {{ render_select_label(form.pause_length) }}
+                        <span class="pure-form-message-inline">After a reservation notification, how long to pause before checking again.</span>
+                    </div>
+                    <div class="pure-control-group">
+                        {% if not hide_remove_pass %}
+                            {% if current_user.is_authenticated %}
+                            <a href="{{url_for('settings_page', removepassword='yes')}}"
+                               class="pure-button pure-button-primary">Remove password</a>
+                            {% else %}
+                            {{ render_field(form.password) }}
+                            <span class="pure-form-message-inline">Password protection for your ADRFinder application.</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="pure-form-message-inline">Password is locked.</span>
+                        {% endif %}
+                    </div>
+                    <div class="pure-control-group">
+                        {{ render_field(form.base_url, placeholder="http://yoursite.com:5500/",
+                        class="m-d") }}
+                        <span class="pure-form-message-inline">
+                            Base URL used for the {base_url} token in notifications and RSS links.<br/>Default value is the ENV var 'BASE_URL' (Currently "{{current_base_url}}"),
+                            <a href="https://github.com/chuckmac/adrfinder/wiki/Configurable-BASE_URL-setting">read more here</a>.
+                        </span>
+                    </div>
+
+                </fieldset>
+            </div>
+
+            <div class="tab-pane-inner" id="notifications">
+                <fieldset>
+                    <div class="field-group">
+                        {{ render_common_settings_form(form, current_base_url) }}
+                    </div>
+                </fieldset>
+                <a href="{{url_for('notification_logs')}}">Notification debug logs</a>
+
+            </div>
+
+
+            <div id="actions">
+                <div class="pure-control-group">
+                    <button type="submit" class="pure-button pure-button-primary">Save</button>
+                                           <a href="{{url_for('index')}}" class="pure-button button-small button-cancel">Back</a>
+                        <a href="{{url_for('scrub_page')}}" class="pure-button button-small button-cancel">Delete
+                            History
+                            Snapshot Data</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
