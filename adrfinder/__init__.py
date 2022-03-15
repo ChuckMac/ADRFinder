@@ -3,7 +3,6 @@
 
 # @todo logging
 # @todo extra options for url like , verify=False etc.
-# @todo enable https://urllib3.readthedocs.io/en/latest/user-guide.html#ssl as option?
 # @todo option for interval day/6 hour/etc
 # @todo on change detected, config for calling some API
 # @todo fetch title into json
@@ -35,7 +34,6 @@ from flask import (
     url_for,
 )
 from flask_login import login_required
-from adrfinder import html_tools
 from adrfinder.restaurants import Restaurants
 
 __version__ = '0.1.0'
@@ -67,12 +65,11 @@ app.config['NEW_VERSION_AVAILABLE'] = False
 
 app.config['LOGIN_DISABLED'] = False
 
-#app.config["EXPLAIN_TEMPLATE_LOADING"] = True
-
 # Disables caching of the templates
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 
-notification_debug_log=[]
+notification_debug_log = []
+
 
 def init_app_secret(datastore_path):
     secret = ""
@@ -91,8 +88,10 @@ def init_app_secret(datastore_path):
 
     return secret
 
+
 # Remember python is by reference
-# populate_form in wtfors didnt work for me. (try using a setattr() obj type on datastore.watch?)
+# populate_form in wtfors didnt work for me. (try using a setattr() obj 
+# type on datastore.watch?)
 def populate_form_from_watch(form, watch):
     for i in form.__dict__.keys():
         if i[0] != '_':
@@ -101,8 +100,8 @@ def populate_form_from_watch(form, watch):
                 setattr(p, "data", watch[i])
 
 
-# We use the whole watch object from the store/JSON so we can see if there's some related status in terms of a thread
-# running or something similar.
+# We use the whole watch object from the store/JSON so we can see if there's 
+# some related status in terms of a thread running or something similar.
 @app.template_filter('format_last_checked_time')
 def _jinja2_filter_datetime(watch_obj, format="%Y-%m-%d %H:%M:%S"):
     # Worker thread tells us which UUID it is currently processing.
@@ -130,19 +129,23 @@ def _jinja2_filter_datetimestamp(timestamp, format="%Y-%m-%d %H:%M:%S"):
 
 
 class User(flask_login.UserMixin):
-    id=None
+    id = None
 
     def set_password(self, password):
         return True
+
     def get_user(self, email="defaultuser@adrfinder.com"):
         return self
-    def is_authenticated(self):
 
+    def is_authenticated(self):
         return True
+
     def is_active(self):
         return True
+
     def is_anonymous(self):
         return False
+
     def get_id(self):
         return str(self.id)
 
@@ -160,27 +163,26 @@ class User(flask_login.UserMixin):
 
         raw_salt_pass = base64.b64decode(raw_salt_pass)
 
-
         salt_from_storage = raw_salt_pass[:32]  # 32 is the length of the salt
 
-        # Use the exact same setup you used to generate the key, but this time put in the password to check
+        # Use the exact same setup you used to generate the key, but 
+        # this time put in the password to check
         new_key = hashlib.pbkdf2_hmac(
             'sha256',
             password.encode('utf-8'),  # Convert the password to bytes
             salt_from_storage,
             100000
         )
-        new_key =  salt_from_storage + new_key
+        new_key = salt_from_storage + new_key
 
         return new_key == raw_salt_pass
 
     pass
 
+
 def adrfinder_app(config=None, datastore_o=None):
     global datastore
     datastore = datastore_o
-
-    #app.config.update(config or {})
 
     login_manager = flask_login.LoginManager(app)
     login_manager.login_view = 'login'

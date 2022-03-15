@@ -9,7 +9,6 @@ import logging
 import time
 import threading
 import os
-from xml.dom.minidom import TypeInfo
 
 from adrfinder.notification import default_notification_format, default_notification_body, default_notification_title
 
