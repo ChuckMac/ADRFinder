@@ -112,7 +112,7 @@
                        class="pure-button button-small pure-button-primary">Recheck</a>
                     {% endif %}
                     <a href="{{ url_for('edit_page', uuid=watch.uuid)}}" class="pure-button button-small pure-button-primary">Edit</a>
-                    {% if watch.history %}
+                    {% if watch.last_checked %}
                     <a href="{{ url_for('history_page', uuid=watch.uuid) }}" target="{{watch.uuid}}" class="pure-button button-small pure-button-primary">History</a>
                     {% endif %}
                 </td>

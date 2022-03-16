@@ -375,7 +375,6 @@ def adrfinder_app(config=None, datastore_o=None):
                 watch['uuid'] = uuid
                 sorted_watches.append(watch)
 
-
         sorted_watches.sort(key=lambda x: x['last_changed'], reverse=True)
 
         existing_tags = datastore.get_all_tags()
@@ -673,8 +672,6 @@ def adrfinder_app(config=None, datastore_o=None):
             flash("No history found for the specified link, bad link?", "error")
             return redirect(url_for('index'))
 
-        dates = list(watch['history'].keys())
-
         rest_and_times = get_restaurants_and_times()
 
         total_matches = 0
@@ -687,9 +684,7 @@ def adrfinder_app(config=None, datastore_o=None):
                     history.append({'date': date, 'time': offer['time'], 'url': offer['url']})
 
         output = render_template("history.html", watch_a=watch,
-                                 versions=dates[1:],
                                  uuid=uuid,
-                                 newest_version_timestamp=dates[0],
                                  history=history,
                                  total_searches=watch['total_searches'],
                                  total_matches=total_matches,
