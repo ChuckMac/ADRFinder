@@ -709,7 +709,7 @@ def adrfinder_app(config=None, datastore_o=None):
             datastore.sync_to_json()
 
             # Add the index
-            zipObj.write(os.path.join(datastore_o.datastore_path, "url-watches.json"), arcname="url-watches.json")
+            zipObj.write(os.path.join(datastore_o.datastore_path, "restaurant-watches.json"), arcname="restaurant-watches.json")
 
             # Add the flask app secret
             zipObj.write(os.path.join(datastore_o.datastore_path, "secret.txt"), arcname="secret.txt")

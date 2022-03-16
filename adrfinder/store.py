@@ -23,7 +23,7 @@ class ADRFinderStore:
         # logging.basicConfig(filename='/dev/stdout', level=logging.INFO)
         self.needs_write = False
         self.datastore_path = datastore_path
-        self.json_store_path = "{}/url-watches.json".format(self.datastore_path)
+        self.json_store_path = "{}/restaurant-watches.json".format(self.datastore_path)
         self.stop_thread = False
 
         self.__data = {

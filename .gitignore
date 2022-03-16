@@ -1,7 +1,7 @@
 __pycache__
 .idea
 *.pyc
-datastore/url-watches.json
+datastore/restaurant-watches.json
 datastore/*
 __pycache__
 .pytest_cache
