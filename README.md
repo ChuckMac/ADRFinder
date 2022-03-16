@@ -1,5 +1,5 @@
 #  ADRFinder
-[![License][license-shield]](LICENSE.md)]
+[![License][license-shield]](LICENSE.md)
 
 ![ADRFinder](https://github.com/chuckmac/adrfinder/actions/workflows/test-only.yml/badge.svg?branch=master)
 
@@ -20,7 +20,8 @@ $ docker-compose up -d
 ```
 Docker standalone
 ```bash
-$ docker run -d --restart always -p "127.0.0.1:5500:5500" -v datastore-volume:/datastore --name adrfinder chuckmac/adrfinder
+$ docker build -t adrfinder .
+$ docker run -d --restart always -p "127.0.0.1:5500:5500" -v datastore-volume:/datastore --name adrfinder adrfinder
 ```
 
 ## Updating
