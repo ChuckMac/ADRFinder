@@ -771,35 +771,6 @@ def adrfinder_app(config=None, datastore_o=None):
                                  compress_type=zipfile.ZIP_DEFLATED,
                                  compresslevel=8)
 
-            # Create a list file with just the URLs, so it's easier to port somewhere else in the future
-            list_file = "url-list.txt"
-            with open(os.path.join(datastore_o.datastore_path, list_file), "w") as f:
-                for uuid in datastore.data["watching"]:
-                    url = datastore.data["watching"][uuid]["url"]
-                    f.write("{}\r\n".format(url))
-            list_with_tags_file = "url-list-with-tags.txt"
-            with open(
-                os.path.join(datastore_o.datastore_path, list_with_tags_file), "w"
-            ) as f:
-                for uuid in datastore.data["watching"]:
-                    url = datastore.data["watching"][uuid]["url"]
-                    tag = datastore.data["watching"][uuid]["tag"]
-                    f.write("{} {}\r\n".format(url, tag))
-
-            # Add it to the Zip
-            zipObj.write(
-                os.path.join(datastore_o.datastore_path, list_file),
-                arcname=list_file,
-                compress_type=zipfile.ZIP_DEFLATED,
-                compresslevel=8,
-            )
-            zipObj.write(
-                os.path.join(datastore_o.datastore_path, list_with_tags_file),
-                arcname=list_with_tags_file,
-                compress_type=zipfile.ZIP_DEFLATED,
-                compresslevel=8,
-            )
-
         # Send_from_directory needs to be the full absolute path
         return send_from_directory(os.path.abspath(datastore_o.datastore_path), backupname, as_attachment=True)
 
