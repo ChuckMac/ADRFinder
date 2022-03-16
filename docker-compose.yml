@@ -7,7 +7,7 @@ services:
       container_name: adrfinder
       hostname: adrfinder
       volumes:
-        - ./datastore:/datastore:/datastore
+        - ./datastore:/datastore
         - .:/app
       ports:
         - 5500:5500
