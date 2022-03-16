@@ -1,9 +1,14 @@
 #  ADRFinder
-[![License][license-shield]](LICENSE.md)
+[![License][license-shield]](LICENSE.md)]
+
+![ADRFinder](https://github.com/chuckmac/adrfinder/actions/workflows/test-only.yml/badge.svg?branch=master)
 
 ## Self-Hosted, Open Source, Advanced Dining Reservation Notifications for Disney World
 
 Get a notification when those those hard to find dining reservations beceome available at Walt Disney World.
+
+<img src="https://raw.githubusercontent.com/chuckmac/adrfinder/master/screenshot.png" style="max-width:100%;" alt="Self-hosted reservation finder"  title="Self-hosted reservation finder"  />
+
 
 ## Installation
 
@@ -45,6 +50,9 @@ Just some examples
     syslog://
  
 <a href="https://github.com/caronc/apprise#popular-notification-services">And everything else in this list!</a>
+
+<img src="https://raw.githubusercontent.com/chuckmac/adrfinder/master/screenshot-notifications.png" style="max-width:100%;" alt="Self-hosted reservation notifications"  title="Self-hosted reservation monitoring notifications"  />
+
 
 You can also customise your notification content!
 
