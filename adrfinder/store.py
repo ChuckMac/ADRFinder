@@ -283,15 +283,7 @@ class ADRFinderStore:
             if uuid == 'all':
                 self.__data['watching'] = {}
 
-                # GitHub #30 also delete history records
-                for uuid in self.data['watching']:
-                    for path in self.data['watching'][uuid]['history'].values():
-                        self.unlink_history_file(path)
-
             else:
-                for path in self.data['watching'][uuid]['history'].values():
-                    self.unlink_history_file(path)
-
                 del self.data['watching'][uuid]
 
             self.needs_write = True
