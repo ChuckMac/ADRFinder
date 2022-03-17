@@ -68,6 +68,7 @@ app.config['LOGIN_DISABLED'] = False
 # Disables caching of the templates
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 
+
 notification_debug_log = []
 
 
@@ -252,6 +253,8 @@ def adrfinder_app(config=None, datastore_o=None):
         # Disable password login if there is not one set
         # (No password in settings or env var)
         app.config['LOGIN_DISABLED'] = datastore.data['settings']['application']['password'] == False and os.getenv("SALTED_PASS", False) == False
+
+        app.config['UPLOAD_FOLDER'] = app.config['datastore_path']
 
         # For the RSS path, allow access via a token
         if request.path == '/rss' and request.args.get('token'):
@@ -571,35 +574,58 @@ def adrfinder_app(config=None, datastore_o=None):
     @app.route("/import", methods=['GET', "POST"])
     @login_required
     def import_page():
-        import validators
-        remaining_urls = []
-
-        good = 0
+        import json
+        import pprint
 
         if request.method == 'POST':
-            urls = request.values.get('urls').split("\n")
-            for url in urls:
-                url = url.strip()
-                url, *tags = url.split(" ")
-                # Flask wtform validators wont work with basic auth, use validators package
-                if len(url) and validators.url(url):
-                    new_uuid = datastore.add_watch(url=url.strip(), tag=" ".join(tags))
-                    # Straight into the queue.
-                    update_q.put(new_uuid)
-                    good += 1
-                else:
-                    if len(url):
-                        remaining_urls.append(url)
 
-            flash("{} Imported, {} Skipped.".format(good, len(remaining_urls)))
+            if 'importfile' not in request.files:
+                flash("Error: No File Uploaded")
+                output = render_template("import.html")
+                return output
 
-            if len(remaining_urls) == 0:
-                # Looking good, redirect to index.
-                return redirect(url_for('index'))
+            upload_file = request.files['importfile']
+            upload_file.seek(0)
+            file_contents = upload_file.read()
+
+            try:
+                data = json.loads(file_contents)
+            except ValueError as e:
+                flash("Error: File contains invalid JSON. {}".format(e))
+                output = render_template("import.html")
+                return output
+
+            if 'watching' not in data:
+                flash("Error: No restaurant watches found in file")
+                output = render_template("import.html")
+                return output
+
+            # Import as new watch but save existing data
+            added = 0
+            for uuid, watch in data['watching'].items():
+                pprint.pprint(watch)
+                new_uuid = datastore.add_watch(
+                    restaurant=watch['restaurant'],
+                    date=watch['date'],
+                    party_size=watch['party_size'],
+                    search_time=watch['search_time'],
+                    tag=watch['tag'],
+                    extras=watch
+                )
+                added += 1
+
+            flash("{} restaurant watches added.".format(added))
+
+            setting = request.values.get('setting')
+            print("Setting {}".format(setting))
+            if 'all_settings' == setting:
+                datastore.settings = data['settings']
+                datastore.needs_write = True
+                flash("Settings have been updated")
 
         # Could be some remaining, or we could be on GET
         output = render_template("import.html",
-                                 remaining="\n".join(remaining_urls)
+                                 remaining=""
                                  )
         return output
 

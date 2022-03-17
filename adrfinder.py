@@ -69,10 +69,6 @@ def main():
     datastore = store.ADRFinderStore(datastore_path=app_config['datastore_path'], version_tag=adrfinder.__version__)
     app = adrfinder.adrfinder_app(app_config, datastore)
 
-    # Go into cleanup mode
-    if do_cleanup:
-        datastore.remove_unused_snapshots()
-
     app.config['datastore_path'] = datastore_path
 
 
