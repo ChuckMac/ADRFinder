@@ -254,8 +254,6 @@ def adrfinder_app(config=None, datastore_o=None):
         # (No password in settings or env var)
         app.config['LOGIN_DISABLED'] = datastore.data['settings']['application']['password'] == False and os.getenv("SALTED_PASS", False) == False
 
-        app.config['UPLOAD_FOLDER'] = app.config['datastore_path']
-
         # For the RSS path, allow access via a token
         if request.path == '/rss' and request.args.get('token'):
             app_rss_token = datastore.data['settings']['application']['rss_access_token']
@@ -575,7 +573,6 @@ def adrfinder_app(config=None, datastore_o=None):
     @login_required
     def import_page():
         import json
-        import pprint
 
         if request.method == 'POST':
 
@@ -603,7 +600,6 @@ def adrfinder_app(config=None, datastore_o=None):
             # Import as new watch but save existing data
             added = 0
             for uuid, watch in data['watching'].items():
-                pprint.pprint(watch)
                 new_uuid = datastore.add_watch(
                     restaurant=watch['restaurant'],
                     date=watch['date'],
@@ -617,7 +613,6 @@ def adrfinder_app(config=None, datastore_o=None):
             flash("{} restaurant watches added.".format(added))
 
             setting = request.values.get('setting')
-            print("Setting {}".format(setting))
             if 'all_settings' == setting:
                 datastore.settings = data['settings']
                 datastore.needs_write = True
