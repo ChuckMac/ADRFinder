@@ -5,7 +5,7 @@
 
 ## Self-Hosted, Open Source, Advanced Dining Reservation Notifications for Disney World
 
-Get a notification when those those hard to find dining reservations beceome available at Walt Disney World.
+Get a notification when those those hard to find dining reservations become available at Walt Disney World.
 
 <img src="https://raw.githubusercontent.com/chuckmac/adrfinder/master/screenshot.png" style="max-width:100%;" alt="Self-hosted reservation finder"  title="Self-hosted reservation finder"  />
 
