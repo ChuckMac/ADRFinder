@@ -1,5 +1,5 @@
 #  ADRFinder
-[![License][license-shield]](LICENSE.md)
+![Release](https://img.shields.io/github/v/tag/chuckmac/adrfinder?style=for-the-badge) [![License](https://img.shields.io/github/license/ChuckMac/ADRFinder?style=for-the-badge)](https://github.com/ChuckMac/ADRFinder/blob/master/LICENSE)
 
 ![ADRFinder](https://github.com/chuckmac/adrfinder/actions/workflows/test-only.yml/badge.svg?branch=master)
 
