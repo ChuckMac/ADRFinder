@@ -20,8 +20,7 @@ $ docker-compose up -d
 ```
 Docker standalone
 ```bash
-$ docker build -t adrfinder .
-$ docker run -d --restart always -p "127.0.0.1:5500:5500" -v datastore-volume:/datastore --name adrfinder adrfinder
+$ docker run -d --restart always -p "127.0.0.1:5500:5500" -v datastore-volume:/datastore --name adrfinder chuckmacdev/adrfinder
 ```
 
 ## Updating
