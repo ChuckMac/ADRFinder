@@ -36,7 +36,7 @@ from flask import (
 from flask_login import login_required
 from adrfinder.restaurants import Restaurants
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 datastore = None
 
@@ -346,6 +346,7 @@ def adrfinder_app(config=None, datastore_o=None):
 
         # Sort by last_changed and add the uuid which is usually the key..
         sorted_watches = []
+        expired_watches = []
         rest_and_times = get_restaurants_and_times()
         for uuid, watch in datastore.data['watching'].items():
 
@@ -370,13 +371,19 @@ def adrfinder_app(config=None, datastore_o=None):
                     tag_in_watch = tag_in_watch.strip()
                     if tag_in_watch == limit_tag:
                         watch['uuid'] = uuid
-                        sorted_watches.append(watch)
+                        if watch['expired'] is True:
+                            expired_watches.append(watch)
+                        else:
+                            sorted_watches.append(watch)
 
             else:
                 watch['uuid'] = uuid
-                sorted_watches.append(watch)
+                if watch['expired'] is True:
+                    expired_watches.append(watch)
+                else:
+                    sorted_watches.append(watch)
 
-        sorted_watches.sort(key=lambda x: x['last_changed'], reverse=True)
+        sorted_watches.extend(expired_watches)
 
         existing_tags = datastore.get_all_tags()
 
@@ -454,6 +461,7 @@ def adrfinder_app(config=None, datastore_o=None):
                                 'date': form.date.data,
                                 'party_size': form.party_size.data.strip(),
                                 'search_time': form.search_time.data.strip(),
+                                'found_reservations': "ZZ:00 AM - https://disneyworld.disney.go.com/",
                                 'notification_urls': form.notification_urls.data,
                                 'notification_title': form.notification_title.data,
                                 'notification_body': form.notification_body.data,
@@ -539,7 +547,11 @@ def adrfinder_app(config=None, datastore_o=None):
 
             if form.trigger_check.data:
                 if len(form.notification_urls.data):
-                    n_object = {'watch_url': "Test from ADRFinder!",
+                    n_object = {'restaurant': "Test from ADR Finder",
+                                'search_date': "1/1/1970",
+                                'party_size': "1",
+                                'search_time': "Lunch",
+                                'found_reservations': "11:00 AM - https://disneyworld.disney.go.com/",
                                 'notification_urls': form.notification_urls.data,
                                 'notification_title': form.notification_title.data,
                                 'notification_body': form.notification_body.data,
@@ -900,7 +912,7 @@ def notification_runner():
                 notification.process_notification(n_object, datastore)
 
             except Exception as e:
-                print("Watch URL: {}  Error {}".format(n_object['watch_url'], str(e)))
+                print("Restaurant: {}  Error {}".format(n_object['restaurant'], str(e)))
 
                 # UUID wont be present when we submit a 'test' from the global settings
                 if 'uuid' in n_object:
