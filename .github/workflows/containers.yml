@@ -92,7 +92,7 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKER_HUB_USERNAME }}/adrfinder:latest
-            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/chuckmac/adrfinder:latest
           platforms: linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
