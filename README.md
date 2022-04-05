@@ -23,6 +23,8 @@ Docker standalone
 $ docker run -d --restart always -p "127.0.0.1:5500:5500" -v datastore-volume:/datastore --name adrfinder chuckmacdev/adrfinder
 ```
 
+Then visit <a href="http://127.0.0.1:5500">http://127.0.0.1:5500</a> in your web browser
+
 ## Updating
 
 ### docker-compose
