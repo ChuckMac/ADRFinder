@@ -1,11 +1,7 @@
-import time
 import urllib3
 import urllib.parse
 import json
-import requests
-import time
 import http.client
-from datetime import datetime, timedelta
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -55,8 +51,12 @@ class perform_site_check():
         party_size = self.datastore.get_val(uuid, 'party_size')
         search_time = urllib.parse.quote(self.datastore.get_val(uuid, 'search_time'))
 
+        entity = restaurant[restaurant.index('entityType'):]
+
+        endpoint = "/finder/api/v1/explorer-service/dining-availability-list/false/wdw/80007798;" + entity + "/" + date + "/" + party_size + "/?searchTime=" + search_time
+
         try:
-            self.connection.request("GET", "/finder/api/v1/explorer-service/dining-availability-list/false/wdw/80007798;entityType=destination/" + date + "/" + party_size + "/?searchTime=" + search_time, headers=self.headers)
+            self.connection.request("GET", endpoint, headers=self.headers)
         except Exception as e:
             print(">> Request failed, Unable to get reservation data: {}".format(e))
             raise SystemExit(e)
@@ -64,6 +64,7 @@ class perform_site_check():
         response = self.connection.getresponse()
         if response.status != 200:
             print(">> Request failed, Non-200 received getting reservation data: {}".format(response.status))
+            print(">> Request url: https://disneyworld.disney.go.com{}".format(endpoint))
             raise SystemExit(response.status)
 
         data = response.read()
