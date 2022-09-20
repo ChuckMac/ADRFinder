@@ -51,9 +51,10 @@ class perform_site_check():
         party_size = self.datastore.get_val(uuid, 'party_size')
         search_time = urllib.parse.quote(self.datastore.get_val(uuid, 'search_time'))
 
-        entity = restaurant[restaurant.index('entityType'):]
-
-        endpoint = "/finder/api/v1/explorer-service/dining-availability-list/false/wdw/80007798;" + entity + "/" + date + "/" + party_size + "/?searchTime=" + search_time
+        if '%3A' in search_time:
+            endpoint = "/finder/api/v1/explorer-service/dining-availability-list/false/wdw/80007798;entityType=destination/" + date + "/" + party_size + "/?searchTime=" + search_time
+        else:
+            endpoint = "/finder/api/v1/explorer-service/dining-availability-list/false/wdw/80007798;entityType=destination/" + date + "/" + party_size + "/?mealPeriod=" + search_time
 
         try:
             self.connection.request("GET", endpoint, headers=self.headers)
