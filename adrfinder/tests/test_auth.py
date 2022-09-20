@@ -6,8 +6,8 @@ from adrfinder import fetch_site_status
 def test_wdw_auth(app, client):
     datastore = ADRFinderStore_test()
     update_handler = fetch_site_status.perform_site_check(datastore=datastore)
-    request_header = update_handler.get_auth_header()
-    assert len(request_header["Authorization"]) > 7
+    request_header = update_handler.get_auth_cookie()
+    assert len(request_header["Cookie"]) > 7
 
 
 class ADRFinderStore_test:
