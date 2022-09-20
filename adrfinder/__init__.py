@@ -36,7 +36,7 @@ from flask import (
 from flask_login import login_required
 from adrfinder.restaurants import Restaurants
 
-__version__ = '0.1.2'
+__version__ = '0.2'
 
 datastore = None
 
@@ -1017,6 +1017,7 @@ def get_restaurants_and_times():
     if rest_last_updated == '' or refresh_time <= int(time.time()):
         rest = Restaurants()
         restaurants = rest.get_restaurants()
+        print(restaurants)
         search_times = rest.get_search_times()
         rest_and_times = {'restaurants': restaurants, 'search_times': search_times}
 

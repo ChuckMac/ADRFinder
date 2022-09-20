@@ -1,47 +1,62 @@
 import json
-import re
-import requests
-from adrfinder import content_fetcher
-from bs4 import BeautifulSoup
-#from auth import Auth
+import http.client
+import datetime
 from collections import OrderedDict
+
 
 class Restaurants(object):
 
     def __init__(self):
-        #self.header = Auth.get_auth()
-        test='test'
+        self.connection = http.client.HTTPSConnection("disneyworld.disney.go.com")
+        self.header = self.get_auth_cookie()
 
-    def get_dining_page(self):
+    def get_auth_cookie(self):
         """
-        Get the dining page for WDW
+        Get the authorization cookie
         """
-        if hasattr(self, 'dining_page'):
-            return self.dining_page
-
-        request_headers = {}
-        request_headers["Accept"] = "*/*"
-        request_headers["X-Requested-With"] = "XMLHttpRequest"
-        request_headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36"
-        url='https://disneyworld.disney.go.com/dining/'
+        payload = "{}"
+        headers = {}
 
         try:
-            r = requests.get(url=url,
-                             headers=request_headers,
-                             timeout=20,
-                             verify=False)
-            r.raise_for_status()
-        except requests.exceptions.RequestException as e:
-            print(">> Request failed: {}".format(e))
+            self.connection.request("POST", "/finder/api/v1/authz/public", payload, headers)
+        except Exception as e:
+            print(">> Request failed, Unable to get AUTH cookie: {}".format(e))
             raise SystemExit(e)
 
-        r.encoding = "utf-8"
-        html_content = r.text
+        response = self.connection.getresponse()
+        if response.status != 200:
+            print(">> Request failed, Non-200 received getting AUTH cookie: {}".format(response.status))
+            raise SystemExit(response.status)
 
-        dining_page = BeautifulSoup(html_content, 'html.parser')
+        response.read()
+        headers['Cookie'] = response.getheader('set-cookie')
 
-        self.dining_page = dining_page
-        return self.dining_page
+        return headers
+
+    def get_dining_data(self):
+        """
+        Get the dining info for WDW
+        """
+        if hasattr(self, 'dining_data'):
+            return self.dining_data
+
+        yyyymmdd = datetime.datetime.today().strftime('%Y-%m-%d')
+
+        try:
+            self.connection.request("GET", "/finder/api/v1/explorer-service/list-ancestor-entities/wdw/80007798;entityType=destination/" + yyyymmdd + "/dining", headers=self.header)
+        except Exception as e:
+            print(">> Request failed, Unable to get Dining Data: {}".format(e))
+            raise SystemExit(e)
+
+        response = self.connection.getresponse()
+        if response.status != 200:
+            print(">> Request failed, Non-200 received getting Dining Data: {}".format(response.status))
+            raise SystemExit(response.status)
+
+        data = response.read()
+
+        self.dining_data = json.loads(data.decode("utf-8"))
+        return self.dining_data
 
     def get_restaurants(self):
         """
@@ -50,74 +65,49 @@ class Restaurants(object):
 
         return: dict { restaurant_name: restaurant_id;type }
 
-        TODO: Probably is a better way to do this than
-        scraping but haven't found an endpoint
-        yet that doesn't require looping through every
-        restaurant (300+ API hits)
         """
 
-        dining_page = self.get_dining_page()
+        dining_data = self.get_dining_data()
 
-        ###
-        ## Parse out restaurant ID to name correlation
-        ###
-        restautant_info = {}
-        parent = dining_page.find('div', {"id" : 'finderListView'})
-        for li in parent.find_all("li", attrs={'data-entityid' : True}):
-            id = li['data-entityid']
-            cardName = li.find('h2', {"class" : 'cardName'}).text
-            restautant_info[id] = cardName
+        restaurant_results = {}
 
-        ###
-        ## Parse javascript data for restaurant reservation availability
-        ###
-        script_data = dining_page.find('script', {"id" : 'finderBlob'})
+        for result in dining_data['results']:
+            accepts_reservations = False
 
-        for script_line in script_data.text.split('\n'):
-            if "PEP.Finder.List =" in script_line:
-                restaurant_value = '{%s}' % (script_line.partition('{')[2].rpartition('}')[0],)
-                restaurant_data = json.loads(restaurant_value)
+            for facet in result['facets']:
+                for flag in result['facets'][facet]:
+                    if 'reservations-accepted' == flag:
+                        accepts_reservations = True
 
-        ### 
-        ## Parse filter 
-        ## Restaurant should have "reservation-accepted" facet 
-        ## id set to a value (no value seems to mean restaurant is closed)
-        ## value set to 1 for reservations
-        ###
-        accepts_reservations = {}
-        for card in restaurant_data['cards']:
-            if "reservations-accepted" in  restaurant_data['cards'][card]['facets']:
-                if "" != restaurant_data['cards'][card]['facets']['reservations-accepted']['id']:
-                    if 1 == restaurant_data['cards'][card]['facets']['reservations-accepted']['value']:
-                        id = restaurant_data['cards'][card]['id']
-                        accepts_reservations[id] = restautant_info[id]
+            if accepts_reservations is True:
+                restaurant_results[result['id']] = result['name']
 
-        return accepts_reservations
+        return restaurant_results
 
     def get_search_times(self):
         """
         Get the valid search times => values from disney dining page
         """
 
-        dining_page = self.get_dining_page()
+        dining_data = self.get_dining_data()
 
-        search_info = OrderedDict()
-        search_data = dining_page.find('span', {"id" : 'searchTime-wrapper'})
-        for option in search_data.find_all("option"):
-            search_info[option['value']] = option['label']
-        
-        return search_info
+        search_times = OrderedDict()
+
+        for mealPeriods in dining_data['filters']['diningFormFilter']['mealPeriods']:
+            search_times[mealPeriods['key']] = mealPeriods['value']
+
+        for mealTimes in dining_data['filters']['diningFormFilter']['times']:
+            search_times[mealTimes['key']] = mealTimes['value']
+
+        return search_times
 
     def get_party_size(self):
         """
-        Get the valid search times => values from disney dining page
+        Hardcode max party
         """
 
-        dining_page = self.get_dining_page()
-
         search_info = OrderedDict()
-        search_data = dining_page.find('span', {"id" : 'partySize-wrapper'})
-        for option in search_data.find_all("option"):
-            search_info[option['label']] = option['value']
-        
+        for n in range(1, 51):
+            search_info[n] = n
+
         return search_info
