@@ -40,7 +40,7 @@ class ADRFinderStore:
                     'timeout': 15,  # Default 15 seconds
                     'minutes_between_check': 20,  # Default 20 minutes
                     'minutes_before_restaurant_refresh': 60 * 8,  # Default 8 hours
-                    'workers': 10  # Number of threads, lower is better for slow connections
+                    'workers': 1  # Number of threads, lower is better for slow connections
                 },
                 'application': {
                     'password': False,
