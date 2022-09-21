@@ -26,12 +26,12 @@ class perform_site_check():
             self.connection.request("POST", "/finder/api/v1/authz/public", payload, headers)
         except Exception as e:
             print(">> Request failed, Unable to get AUTH cookie: {}".format(e))
-            raise SystemExit(e)
+            raise Exception("Request failed, Unable to get AUTH cookie: {}".format(e))
 
         response = self.connection.getresponse()
         if response.status != 200:
             print(">> Request failed, Non-200 received getting AUTH cookie: {}".format(response.status))
-            raise SystemExit(response.status)
+            raise Exception("Request failed, Non-200 received getting AUTH cookie: {}".format(response.status))
 
         response.read()
         headers['Cookie'] = response.getheader('set-cookie')
@@ -60,13 +60,13 @@ class perform_site_check():
             self.connection.request("GET", endpoint, headers=self.headers)
         except Exception as e:
             print(">> Request failed, Unable to get reservation data: {}".format(e))
-            raise SystemExit(e)
+            raise Exception("Request failed, Unable to get reservation data: {}".format(e))
 
         response = self.connection.getresponse()
         if response.status != 200:
             print(">> Request failed, Non-200 received getting reservation data: {}".format(response.status))
             print(">> Request url: https://disneyworld.disney.go.com{}".format(endpoint))
-            raise SystemExit(response.status)
+            raise Exception("Request failed, Non-200 received getting reservation data: {}".format(response.status))
 
         data = response.read()
         json_reservations = json.loads(data.decode("utf-8"))
@@ -80,6 +80,6 @@ class perform_site_check():
                     offer_link = base_link + offer['url'] + base_suffix
                     offers.append({'time': offer['label'], 'url': offer_link})
         else:
-            print(">> Restaurant not found")  # Maybe should throw hard error here
+            raise Exception("Restaurant ID not found in data: {}".format(restaurant))
 
         return available_detected, offers
