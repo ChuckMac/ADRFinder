@@ -2,6 +2,7 @@ import urllib3
 import urllib.parse
 import json
 import http.client
+import time
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -18,27 +19,42 @@ class perform_site_check():
         """
         Get the authorization cookie
         """
-        payload = "{}"
+
+        refresh_time = self.datastore.data['cache']['auth']['auth_token_expiry']
+        if type(refresh_time) != int:
+            refresh_time = 0
+
         headers = {}
+        if refresh_time == '' or refresh_time <= int(time.time()):
+            payload = "{}"
 
-        connection = http.client.HTTPSConnection("disneyworld.disney.go.com")
+            connection = http.client.HTTPSConnection("disneyworld.disney.go.com")
 
-        try:
-            connection.request("POST", "/finder/api/v1/authz/public", payload, headers)
-        except Exception as e:
+            try:
+                connection.request("POST", "/finder/api/v1/authz/public", payload, headers)
+            except Exception as e:
+                connection.close()
+                print(">> Request failed, Unable to get AUTH cookie: {}".format(e))
+                raise Exception("Request failed, Unable to get AUTH cookie: {}".format(e))
+
+            response = connection.getresponse()
+            if response.status != 200:
+                connection.close()
+                print(">> Request failed, Non-200 received getting AUTH cookie: {}".format(response.status))
+                raise Exception("Request failed, Non-200 received getting AUTH cookie: {}".format(response.status))
+
+            response.read()
             connection.close()
-            print(">> Request failed, Unable to get AUTH cookie: {}".format(e))
-            raise Exception("Request failed, Unable to get AUTH cookie: {}".format(e))
 
-        response = connection.getresponse()
-        if response.status != 200:
-            connection.close()
-            print(">> Request failed, Non-200 received getting AUTH cookie: {}".format(response.status))
-            raise Exception("Request failed, Non-200 received getting AUTH cookie: {}".format(response.status))
+            cookie = response.getheader('set-cookie')
+            headers['Cookie'] = cookie
 
-        response.read()
-        connection.close()
-        headers['Cookie'] = response.getheader('set-cookie')
+            expires = int(time.time()) + 14000
+            self.datastore.update_auth(cookie, expires)
+
+        else:
+            token = self.datastore.data['cache']['auth']['auth_token']
+            headers['Cookie'] = token
 
         return headers
 
