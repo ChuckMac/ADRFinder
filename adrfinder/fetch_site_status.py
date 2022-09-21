@@ -12,7 +12,6 @@ class perform_site_check():
     def __init__(self, *args, datastore, **kwargs):
         super().__init__(*args, **kwargs)
         self.datastore = datastore
-        self.connection = http.client.HTTPSConnection("disneyworld.disney.go.com")
         self.headers = self.get_auth_cookie()
 
     def get_auth_cookie(self):
@@ -22,18 +21,23 @@ class perform_site_check():
         payload = "{}"
         headers = {}
 
+        connection = http.client.HTTPSConnection("disneyworld.disney.go.com")
+
         try:
-            self.connection.request("POST", "/finder/api/v1/authz/public", payload, headers)
+            connection.request("POST", "/finder/api/v1/authz/public", payload, headers)
         except Exception as e:
+            connection.close()
             print(">> Request failed, Unable to get AUTH cookie: {}".format(e))
             raise Exception("Request failed, Unable to get AUTH cookie: {}".format(e))
 
-        response = self.connection.getresponse()
+        response = connection.getresponse()
         if response.status != 200:
+            connection.close()
             print(">> Request failed, Non-200 received getting AUTH cookie: {}".format(response.status))
             raise Exception("Request failed, Non-200 received getting AUTH cookie: {}".format(response.status))
 
         response.read()
+        connection.close()
         headers['Cookie'] = response.getheader('set-cookie')
 
         return headers
@@ -56,19 +60,24 @@ class perform_site_check():
         else:
             endpoint = "/finder/api/v1/explorer-service/dining-availability-list/false/wdw/80007798;entityType=destination/" + date + "/" + party_size + "/?mealPeriod=" + search_time
 
+        connection = http.client.HTTPSConnection("disneyworld.disney.go.com")
+
         try:
-            self.connection.request("GET", endpoint, headers=self.headers)
+            connection.request("GET", endpoint, headers=self.headers)
         except Exception as e:
+            connection.close()
             print(">> Request failed, Unable to get reservation data: {}".format(e))
             raise Exception("Request failed, Unable to get reservation data: {}".format(e))
 
-        response = self.connection.getresponse()
+        response = connection.getresponse()
         if response.status != 200:
+            connection.close()
             print(">> Request failed, Non-200 received getting reservation data: {}".format(response.status))
             print(">> Request url: https://disneyworld.disney.go.com{}".format(endpoint))
             raise Exception("Request failed, Non-200 received getting reservation data: {}".format(response.status))
 
         data = response.read()
+        connection.close()
         json_reservations = json.loads(data.decode("utf-8"))
 
         offers = []

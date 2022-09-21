@@ -7,7 +7,6 @@ from collections import OrderedDict
 class Restaurants(object):
 
     def __init__(self):
-        self.connection = http.client.HTTPSConnection("disneyworld.disney.go.com")
         self.header = self.get_auth_cookie()
 
     def get_auth_cookie(self):
@@ -17,18 +16,23 @@ class Restaurants(object):
         payload = "{}"
         headers = {}
 
+        connection = http.client.HTTPSConnection("disneyworld.disney.go.com")
+
         try:
-            self.connection.request("POST", "/finder/api/v1/authz/public", payload, headers)
+            connection.request("POST", "/finder/api/v1/authz/public", payload, headers)
         except Exception as e:
+            connection.close()
             print(">> Request failed, Unable to get AUTH cookie: {}".format(e))
             raise SystemExit(e)
 
-        response = self.connection.getresponse()
+        response = connection.getresponse()
         if response.status != 200:
+            connection.close()
             print(">> Request failed, Non-200 received getting AUTH cookie: {}".format(response.status))
             raise SystemExit(response.status)
 
         response.read()
+        connection.close()
         headers['Cookie'] = response.getheader('set-cookie')
 
         return headers
@@ -42,18 +46,23 @@ class Restaurants(object):
 
         yyyymmdd = datetime.datetime.today().strftime('%Y-%m-%d')
 
+        connection = http.client.HTTPSConnection("disneyworld.disney.go.com")
+
         try:
-            self.connection.request("GET", "/finder/api/v1/explorer-service/list-ancestor-entities/wdw/80007798;entityType=destination/" + yyyymmdd + "/dining", headers=self.header)
+            connection.request("GET", "/finder/api/v1/explorer-service/list-ancestor-entities/wdw/80007798;entityType=destination/" + yyyymmdd + "/dining", headers=self.header)
         except Exception as e:
+            connection.close()
             print(">> Request failed, Unable to get Dining Data: {}".format(e))
             raise SystemExit(e)
 
-        response = self.connection.getresponse()
+        response = connection.getresponse()
         if response.status != 200:
+            connection.close()
             print(">> Request failed, Non-200 received getting Dining Data: {}".format(response.status))
             raise SystemExit(response.status)
 
         data = response.read()
+        connection.close()
 
         self.dining_data = json.loads(data.decode("utf-8"))
         return self.dining_data
