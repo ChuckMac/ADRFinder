@@ -1,5 +1,5 @@
 # pip dependencies install stage
-FROM python:3.8-slim as builder
+FROM python:3.11-slim as builder
 
 # rustc compiler would be needed on ARM type devices but theres an issue with some deps not building..
 ARG CRYPTOGRAPHY_DONT_BUILD_RUST=1
@@ -21,7 +21,7 @@ COPY requirements.txt /requirements.txt
 RUN pip install --target=/dependencies -r /requirements.txt
 
 # Final image stage
-FROM python:3.8-slim
+FROM python:3.11-slim
 
 # Actual packages needed at runtime, usually due to the notification (apprise) backend
 # rustc compiler would be needed on ARM type devices but theres an issue with some deps not building..
