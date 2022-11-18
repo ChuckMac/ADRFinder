@@ -4,6 +4,9 @@ on:
   # Automatically triggered by a new tagged release
   release:
     types: [published, edited]
+  # Rebuild image once a week for security updates
+  schedule:
+    - cron: '30 06 * * 0'
 
 jobs:
   metadata:
