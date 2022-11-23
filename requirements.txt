@@ -18,7 +18,7 @@ wtforms_components ~= 0.10.5
 jsonpath-ng ~= 1.5.3
 
 # Notification library
-apprise ~= 0.9.6
+apprise~=1.2.0
 
 # apprise mqtt https://github.com/chuckmac/adrfinder/issues/315
 paho-mqtt
