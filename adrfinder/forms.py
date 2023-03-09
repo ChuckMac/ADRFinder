@@ -227,7 +227,7 @@ class quickWatchForm(Form):
 
     restaurant = SelectField(u'Restaurant', choices=choices, validators=[InputRequired(), ValidateSelectOption()], widget=CustomSelect())
     date = html5.DateField(u'Date', render_kw={'min': datetime.today().strftime('%Y-%m-%d'), 'max': (datetime.today() + timedelta(days=90)).strftime('%Y-%m-%d')}, validators=[InputRequired(), DateRange(min=datetime.today().date(), max=(datetime.today().date() + timedelta(days=90)))])
-    party_size = SelectField(u'Party Size', choices=[('1', '1 Person'), ('2', '2 People'), ('3', '3 People'), ('4', '4 People'), ('5', '5 People'), ('6', '6 People'), ('7', '7 People'), ('8', '8 People'), ('9', '9 People'), ('10', '10 People')], default="4",  validators=[InputRequired()])
+    party_size = SelectField(u'Party Size', choices=[('1', '1 Person'), ('2', '2 People'), ('3', '3 People'), ('4', '4 People'), ('5', '5 People'), ('6', '6 People'), ('7', '7 People'), ('8', '8 People'), ('9', '9 People'), ('10', '10 People'), ('11', '11 People'), ('12', '12 People'), ('13', '13 People'), ('14', '14 People'), ('15', '15 People'), ('16', '16 People'), ('17', '17 People'), ('18', '18 People'), ('19', '19 People'), ('20', '20 People')], default="4",  validators=[InputRequired()])
     choices = [(k, v) for k, v in rest_and_times['search_times'].items()]
     search_time = SelectField(u'Search Time', choices=choices, validators=[InputRequired()])
 
@@ -250,7 +250,7 @@ class watchForm(commonSettingsForm):
 
     restaurant = SelectField(u'Restaurant', choices=choices, validators=[InputRequired(), ValidateSelectOption()], widget=CustomSelect())
     date = html5.DateField(u'Date', render_kw={'min': datetime.today().strftime('%Y-%m-%d'), 'max': (datetime.today() + timedelta(days=90)).strftime('%Y-%m-%d')}, validators=[InputRequired(), DateRange(min=datetime.today().date(), max=(datetime.today().date() + timedelta(days=90)))])
-    party_size = SelectField(u'Party Size', choices=[('1', '1 Person'), ('2', '2 People'), ('3', '3 People'), ('4', '4 People'), ('5', '5 People'), ('6', '6 People'), ('7', '7 People'), ('8', '8 People'), ('9', '9 People'), ('10', '10 People')], default="4",  validators=[InputRequired()])
+    party_size = SelectField(u'Party Size', choices=[('1', '1 Person'), ('2', '2 People'), ('3', '3 People'), ('4', '4 People'), ('5', '5 People'), ('6', '6 People'), ('7', '7 People'), ('8', '8 People'), ('9', '9 People'), ('10', '10 People'), ('11', '11 People'), ('12', '12 People'), ('13', '13 People'), ('14', '14 People'), ('15', '15 People'), ('16', '16 People'), ('17', '17 People'), ('18', '18 People'), ('19', '19 People'), ('20', '20 People')], default="4",  validators=[InputRequired()])
     choices = [(k, v) for k, v in rest_and_times['search_times'].items()]
     search_time = SelectField(u'Search Time', choices=choices, validators=[InputRequired()])
     
