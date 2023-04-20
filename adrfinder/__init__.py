@@ -36,7 +36,7 @@ from flask import (
 from flask_login import login_required
 from adrfinder.restaurants import Restaurants
 
-__version__ = '0.2.8'
+__version__ = '0.2.9'
 
 datastore = None
 

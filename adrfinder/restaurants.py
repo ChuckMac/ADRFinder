@@ -1,5 +1,6 @@
 import json
 import http.client
+import urllib.parse
 import datetime
 from collections import OrderedDict
 
@@ -26,6 +27,25 @@ class Restaurants(object):
             raise SystemExit(e)
 
         response = connection.getresponse()
+
+        if response.status == 302:
+            # Try redirect for geolocation
+            connection.close()
+            print(">> Request failed, 302 received getting AUTH cookie: {}".format(response.status))
+            location_header = response.getheader('location')
+            location_data = urllib.parse.urlparse(location_header)
+            print(">> Trying redirected location: {}".format(location_data.hostname))
+            connection = http.client.HTTPSConnection(location_data.hostname)
+
+            try:
+                connection.request("POST", "/finder/api/v1/authz/public", payload, headers)
+            except Exception as e:
+                connection.close()
+                print(">> Request failed, Unable to get AUTH cookie: {}".format(e))
+                raise Exception("Request failed, Unable to get AUTH cookie: {}".format(e))
+
+            response = connection.getresponse()
+
         if response.status != 200:
             connection.close()
             print(">> Request failed, Non-200 received getting AUTH cookie: {}".format(response.status))
@@ -56,6 +76,25 @@ class Restaurants(object):
             raise SystemExit(e)
 
         response = connection.getresponse()
+
+        if response.status == 302:
+            # Try redirect for geolocation
+            connection.close()
+            print(">> Request failed, 302 received getting Dining Data: {}".format(response.status))
+            location_header = response.getheader('location')
+            location_data = urllib.parse.urlparse(location_header)
+            print(">> Trying redirected location: {}".format(location_data.hostname))
+            connection = http.client.HTTPSConnection(location_data.hostname)
+
+            try:
+                connection.request("GET", "/finder/api/v1/explorer-service/list-ancestor-entities/wdw/80007798;entityType=destination/" + yyyymmdd + "/dining", headers=self.header)
+            except Exception as e:
+                connection.close()
+                print(">> Request failed, Unable to get Dining Data: {}".format(e))
+                raise Exception("Request failed, Unable to get Dining Data: {}".format(e))
+
+            response = connection.getresponse()
+        
         if response.status != 200:
             connection.close()
             print(">> Request failed, Non-200 received getting Dining Data: {}".format(response.status))

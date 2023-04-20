@@ -38,6 +38,24 @@ class perform_site_check():
                 raise Exception("Request failed, Unable to get AUTH cookie: {}".format(e))
 
             response = connection.getresponse()
+            if response.status == 302:
+                # Try redirect for geolocation
+                connection.close()
+                print(">> Request failed, 302 received getting AUTH cookie: {}".format(response.status))
+                location_header = response.getheader('location')
+                location_data = urllib.parse.urlparse(location_header)
+                print(">> Trying redirected location: {}".format(location_data.hostname))
+                connection = http.client.HTTPSConnection(location_data.hostname)
+
+                try:
+                    connection.request("POST", "/finder/api/v1/authz/public", payload, headers)
+                except Exception as e:
+                    connection.close()
+                    print(">> Request failed, Unable to get AUTH cookie: {}".format(e))
+                    raise Exception("Request failed, Unable to get AUTH cookie: {}".format(e))
+
+                response = connection.getresponse()
+
             if response.status != 200:
                 connection.close()
                 print(">> Request failed, Non-200 received getting AUTH cookie: {}".format(response.status))
@@ -86,6 +104,24 @@ class perform_site_check():
             raise Exception("Request failed, Unable to get reservation data: {}".format(e))
 
         response = connection.getresponse()
+        if response.status == 302:
+            # Try redirect for geolocation
+            connection.close()
+            print(">> Request failed, 302 received getting reservation data: {}".format(response.status))
+            location_header = response.getheader('location')
+            location_data = urllib.parse.urlparse(location_header)
+            print(">> Trying redirected location: {}".format(location_data.hostname))
+            connection = http.client.HTTPSConnection(location_data.hostname)
+
+            try:
+                connection.request("GET", endpoint, headers=self.headers)
+            except Exception as e:
+                connection.close()
+                print(">> Request failed, Unable to get reservation data: {}".format(e))
+                raise Exception("Request failed, Unable to get reservation data: {}".format(e))
+
+            response = connection.getresponse()
+        
         if response.status != 200:
             connection.close()
             print(">> Request failed, Non-200 received getting reservation data: {}".format(response.status))
