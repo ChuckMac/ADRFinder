@@ -1,6 +1,7 @@
 flask~= 2.0
 
-eventlet>=0.31.0
+eventlet==0.33.3
+dnspython==2.3.0
 validators
 timeago ~=1.0
 inscriptis ~= 1.2
