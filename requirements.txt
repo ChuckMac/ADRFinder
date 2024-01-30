@@ -9,6 +9,11 @@ feedgen ~= 0.9
 flask-login ~= 0.5
 pytz
 
+# Hard set this to 2.3.0 as 3.0.0 Broke things
+# https://stackoverflow.com/questions/77215107/importerror-cannot-import-name-url-decode-from-werkzeug-urls
+# reported in: https://github.com/ChuckMac/ADRFinder/issues/23
+werkzeug==2.3.0
+
 # Set these versions together to avoid a RequestsDependencyWarning
 requests[socks] ~= 2.26
 urllib3 > 1.26
